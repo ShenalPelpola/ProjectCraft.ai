@@ -2,24 +2,27 @@
 using MediatR;
 using CliWrap;
 using Domain.Repositories;
-using Microsoft.Extensions.Configuration;
-namespace Application.Projects.Queries.GenerateProject;
+using Domain.Models.Responses;
+using Infrastucture.Services;
+using Domain.Models;
+using Application.Projects.Queries.GenerateProject;
 
-public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery>
+public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery, ProjectGeneration>
 {
     private readonly string _tempDirectoryName = "projectcraft";
-    private readonly IConfiguration _configuration;
     private readonly IBlobStorageRepository _blobStorageRepository;
+    private readonly ChatService _chatService;
 
-    public GenerateProjectQueryHandler(IConfiguration configuration, IBlobStorageRepository blobStorageRepository)
+    public GenerateProjectQueryHandler(IBlobStorageRepository blobStorageRepository, ChatService chatService)
     {
-        _configuration = configuration;
         _blobStorageRepository = blobStorageRepository;
+        _chatService = chatService;
     }
 
-    public async Task Handle(GenerateProjectQuery request, CancellationToken cancellationToken)
+    public async Task<ProjectGeneration> Handle(GenerateProjectQuery request, CancellationToken cancellationToken)
     {
-        string projectId = Guid.NewGuid().ToString();
+        ChatServiceResponse response = await _chatService.GetCommands(request.ConversationId, request.Prompt);
+        string projectId = !string.IsNullOrWhiteSpace(request.projectId) ? request.projectId : Guid.NewGuid().ToString();
         string tempDirectory = Path.Combine(Path.GetTempPath(), _tempDirectoryName);
 
         if (!Directory.Exists(tempDirectory))
@@ -34,18 +37,14 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery>
             Directory.CreateDirectory(projectDirectory);
         }
 
-        string[] commands = {
-             "new sln -n TestApplication",
-             "new webapi -n TestApplication",
-             "sln add ./TestApplication/TestApplication.csproj"
-         };
-
         bool isProjectGenerated = true;
 
-        foreach (var command in commands)
+        foreach (string command in response.Commands)
         {
-            var result = await Cli.Wrap("dotnet")
-                .WithArguments(command)
+            (string executable, string arguments) = SeparateExecutableFromArguments(command);
+
+            CommandResult result = await Cli.Wrap(executable)
+                .WithArguments(arguments)
                 .WithWorkingDirectory($@"{projectDirectory}")
                 .ExecuteAsync();
 
@@ -57,6 +56,7 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery>
 
         if (isProjectGenerated)
         {
+            string fileName = $"{projectId}.zip";
             string zipFilePath = Path.Combine(tempDirectory, $"{projectId}.zip");
             ZipFolder(projectDirectory, zipFilePath);
 
@@ -64,30 +64,38 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery>
             {
                 await using (Stream uploadFileStream = File.OpenRead(zipFilePath))
                 {
-                    await _blobStorageRepository.UploadAsync(projectId, uploadFileStream);
+                    await _blobStorageRepository.UploadAsync(fileName, uploadFileStream);
                 }
 
                 File.Delete(zipFilePath);
+
+                return new ProjectGeneration
+                {
+                    ConversationId = response.ConversationId,
+                    ProjectId = projectId,
+                    FileStructure = null
+                };
             }
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred: " + ex.Message);
-            }
-            finally
-            {
-                if (Directory.Exists(projectDirectory))
+
+                return new ProjectGeneration
                 {
-                    try
-                    {
-                        Directory.Delete(projectDirectory, true);
-                        Console.WriteLine("Directory deleted successfully.");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to delete directory: " + ex.Message);
-                    }
-                }
+                    ConversationId = response.ConversationId,
+                    ProjectId = null,
+                    FileStructure = null
+                };
             }
+        }
+        else
+        {
+            return new ProjectGeneration
+            {
+                ConversationId = response.ConversationId,
+                ProjectId = null,
+                FileStructure = null
+            };
         }
     }
 
@@ -101,5 +109,23 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery>
         }
 
         ZipFile.CreateFromDirectory(sourceDirectory, destinationZipFilePath);
+    }
+
+    public static (string executable, string arguments) SeparateExecutableFromArguments(string command)
+    {
+        command = command.Trim();
+
+        int firstSpaceIndex = command.IndexOf(' ');
+
+        if (firstSpaceIndex != -1)
+        {
+            string executable = command.Substring(0, firstSpaceIndex);
+            string arguments = command.Substring(firstSpaceIndex + 1).Trim();
+            return (executable, arguments);
+        }
+        else
+        {
+            return (command, string.Empty);
+        }
     }
 }

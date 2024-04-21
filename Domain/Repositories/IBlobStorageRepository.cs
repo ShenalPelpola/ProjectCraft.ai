@@ -7,4 +7,6 @@ public interface IBlobStorageRepository
     Task<Stream> DownloadFileAsync(string blobName);
 
     Task DeleteFileAsync(string blobName);
+
+    Task UploadDirectoryAsync(string directoryPath);
 }

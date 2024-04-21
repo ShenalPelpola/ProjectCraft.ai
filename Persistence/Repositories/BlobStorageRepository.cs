@@ -4,7 +4,7 @@ using Azure.Storage.Blobs;
 using Domain.Repositories;
 using Microsoft.Extensions.Configuration;
 
-namespace Persistance.Repositories;
+namespace Persistence.Repositories;
 
 public class BlobStorageRepository : IBlobStorageRepository
 {
@@ -50,5 +50,18 @@ public class BlobStorageRepository : IBlobStorageRepository
         BlobClient blobClient = containerClient.GetBlobClient(blobName);
 
         await blobClient.DeleteIfExistsAsync();
+    }
+
+    public async Task UploadDirectoryAsync(string directoryPath)
+    {
+        BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_configuration["AzureStorage:containerName"]);
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
+
+        foreach (string filePath in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
+        {
+            string blobName = Path.GetRelativePath(directoryPath, filePath);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(filePath, true);
+        }
     }
 }

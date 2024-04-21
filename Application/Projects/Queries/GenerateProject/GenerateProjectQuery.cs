@@ -1,7 +1,10 @@
-﻿using MediatR;
+﻿using Domain.Models;
+using MediatR;
 
 namespace Application.Projects.Queries.GenerateProject;
 
 public sealed record GenerateProjectQuery(
-    string PromptText
-) : IRequest;
+    string projectId,
+    string ConversationId,
+    string Prompt
+) : IRequest<ProjectGeneration>;
