@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Azure;
-using Domain.Repositories;
-using Persistance.Repositories;
+﻿using Application;
+using Infrastucture;
+using Persistences;
 
 namespace API.Extensions
 {
@@ -9,15 +9,9 @@ namespace API.Extensions
         public static IServiceCollection RegisterApplicationServices(this IServiceCollection services, IConfiguration config)
         {
             var sqlliteConnectionString = config.GetConnectionString("DefaultConnection");
-            var azureStorageConnectionString = config.GetValue<string>("AzureStorage:connectionString");
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
-
-            services.AddAzureClients(azureBuilder =>
-            {
-                azureBuilder.AddBlobServiceClient(azureStorageConnectionString);
-            });
 
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy", policy =>
@@ -26,9 +20,9 @@ namespace API.Extensions
                 });
             });
 
-/*            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
-*/            services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
-
+            // Registering the dependency injections
+            services.AddApplication().AddInfrastucture(config).AddPersistence(config);
+        
             return services;
         }
     }

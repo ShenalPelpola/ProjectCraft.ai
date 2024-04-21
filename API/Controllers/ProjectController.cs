@@ -1,22 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Domain.Models.Requests;
 using Application.Projects.Queries.GenerateProject;
+using Domain.Models;
 
 namespace API.Controllers;
 
 public class ProjectController : BaseController
 {
-    [HttpGet]
-    public async Task GetProject()
+    [HttpPost("generate")]
+    public async Task<ProjectGeneration> GenerateProject([FromBody] ChatServiceRequest chatServiceRequest)
     {
         try
         {
-            var query = new GenerateProjectQuery("Hello World");
+            GenerateProjectQuery query = new GenerateProjectQuery(chatServiceRequest.ProjectId, chatServiceRequest.ConversationId, chatServiceRequest.Prompt);
 
-            await Mediator.Send(query);
+            return await Mediator.Send(query);
         }
         catch (Exception ex)
         {
             StatusCode(500, "Internal server error: " + ex.Message);
+            return null;
         }
     }
 }
+
