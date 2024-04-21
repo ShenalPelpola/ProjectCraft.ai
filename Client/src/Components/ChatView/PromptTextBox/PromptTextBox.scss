@@ -1,0 +1,23 @@
+.prompt-textbox {
+    display: flex;
+    align-items: center;
+    background: rgba(28, 30, 58, 1);
+    border-radius: 0.2rem;
+    width: 100%;
+
+    input, button {
+        background: transparent;
+        outline: none;
+        border: none;
+    }
+
+    input {
+        width: 100%;
+        padding: 1.2rem;
+        color: #fff;
+    }
+
+    button {
+        cursor: pointer;
+    }
+}

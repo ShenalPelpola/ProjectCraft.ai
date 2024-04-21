@@ -1,0 +1,21 @@
+.chat-item {
+    display: flex;
+    align-items: flex-start;
+    margin: 1rem;
+    padding: 1rem 3rem;
+    font-size: 14px;
+    text-align: justify;
+
+    img {
+        object-fit: cover;
+        width: 2.5rem;
+        margin-right: 2rem;
+        border-radius: 4px;
+    }
+
+    &.ai-chat-item {
+        background: rgba(28, 30, 58, 1);
+        width: fit-content;
+        border-radius: 4px;
+    }
+}
