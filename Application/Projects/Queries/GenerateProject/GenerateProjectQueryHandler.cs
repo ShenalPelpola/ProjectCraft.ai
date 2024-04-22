@@ -21,8 +21,9 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery,
 
     public async Task<ProjectGeneration> Handle(GenerateProjectQuery request, CancellationToken cancellationToken)
     {
-        ChatServiceResponse response = await _chatService.GetCommands(request.ConversationId, request.Prompt);
-        string projectId = !string.IsNullOrWhiteSpace(request.projectId) ? request.projectId : Guid.NewGuid().ToString();
+        string projectId = !string.IsNullOrWhiteSpace(request.ProjectId) ? request.ProjectId : Guid.NewGuid().ToString();
+
+        ChatServiceResponse response = await _chatService.GetCommands(projectId, request.Prompt);
         string tempDirectory = Path.Combine(Path.GetTempPath(), _tempDirectoryName);
 
         if (!Directory.Exists(tempDirectory))

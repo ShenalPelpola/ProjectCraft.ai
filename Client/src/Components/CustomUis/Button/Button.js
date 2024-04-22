@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import './button.scss';
+import './Button.scss';
 
 export const Button = forwardRef(({ onClick, onMouseOver, onMouseLeave, disabled, className, ...customStyles }, ref) => {
   return (

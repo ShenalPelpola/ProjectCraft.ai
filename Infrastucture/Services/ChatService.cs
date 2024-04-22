@@ -17,13 +17,9 @@ public class ChatService
     {
         Dictionary<string, string> requestBody = new Dictionary<string, string>
         {
-            { "prompt", prompt }
+            { "prompt", prompt },
+            { "conversationId", conversationId }
         };
-
-        if (!string.IsNullOrWhiteSpace(conversationId))
-        {
-            requestBody.Add("conversationId", conversationId);
-        }
 
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/chat/commands", requestBody);
 

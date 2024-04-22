@@ -1,5 +1,5 @@
-import { SideBar } from './Components/ChatView/SideBar/SideBar';
-import { ChatContainer } from './Components/ChatView/ChatContainer/ChatContainer';
+import { SideBar } from './Components/ChatComponents/SideBar/SideBar';
+import { ChatContainer } from './Components/ChatComponents/ChatView/ChatView';
 import './App.css';
 
 function App() {
