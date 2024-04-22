@@ -4,7 +4,6 @@ using MediatR;
 namespace Application.Projects.Queries.GenerateProject;
 
 public sealed record GenerateProjectQuery(
-    string projectId,
-    string ConversationId,
+    string ProjectId,
     string Prompt
 ) : IRequest<ProjectGeneration>;

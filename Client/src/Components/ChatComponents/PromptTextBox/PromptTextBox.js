@@ -37,7 +37,7 @@ PromptTextBox.propTypes = {
     /* Placeholder to dislay in the input */
     placeholder: PropTypes.string,
     /* Function to execute when submitting */
-    onSearchSubmit: PropTypes.string
+    onSearchSubmit: PropTypes.func
 };
 
 PromptTextBox.defaultProps = {

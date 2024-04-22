@@ -12,7 +12,7 @@ public class ProjectController : BaseController
     {
         try
         {
-            GenerateProjectQuery query = new GenerateProjectQuery(chatServiceRequest.ProjectId, chatServiceRequest.ConversationId, chatServiceRequest.Prompt);
+            GenerateProjectQuery query = new GenerateProjectQuery(chatServiceRequest.ProjectId, chatServiceRequest.Prompt);
 
             return await Mediator.Send(query);
         }

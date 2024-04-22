@@ -1,3 +1,4 @@
+import { Button } from '../../CustomUis/Button/Button';
 import logo from '../../../assets/chatgpt.svg';
 import addBtn from '../../../assets/add-30.png';
 import msgIcon from '../../../assets/message.svg';
@@ -18,12 +19,12 @@ export const SideBar = () => {
                     <span>New Project</span>
                 </button>
                 <div className="upper-bottom">
-                    <button className="query">
+                    <Button className="query">
                         <img src={msgIcon} alt="query" className="query-image" /> What is Programming?
-                    </button>
-                    <button className="query">
+                    </Button>
+                    <Button className="query">
                         <img src={msgIcon} alt="query" className="query-image" />What is Programming?
-                    </button>
+                    </Button>
                 </div>
             </div>
             <div className="lower">
