@@ -6,6 +6,7 @@ using Domain.Models.Responses;
 using Infrastucture.Services;
 using Domain.Models;
 using Application.Projects.Queries.GenerateProject;
+using Infrastucture.Operations;
 
 public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery, ProjectGeneration>
 {
@@ -23,22 +24,33 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery,
     {
         string projectId = !string.IsNullOrWhiteSpace(request.ProjectId) ? request.ProjectId : Guid.NewGuid().ToString();
 
-        ChatServiceResponse response = await _chatService.GetCommands(projectId, request.Prompt);
+/*        ChatServiceResponse response = await _chatService.GetCommands(projectId, request.Prompt);
+*/        
         string tempDirectory = Path.Combine(Path.GetTempPath(), _tempDirectoryName);
+
 
         if (!Directory.Exists(tempDirectory))
         {
             Directory.CreateDirectory(tempDirectory);
         }
 
-        string projectDirectory = Path.Combine(tempDirectory, projectId);
+        string projectDirectory = Path.Combine(tempDirectory, "1b0b15d0-710a-47d0-ba96-1c7191e6e2b1");
 
         if (!Directory.Exists(projectDirectory))
         {
             Directory.CreateDirectory(projectDirectory);
         }
 
-        bool isProjectGenerated = true;
+        DirectoryInfo projectDirectoryInfo = new DirectoryInfo(projectDirectory);
+        List<TreeNode> nodes = FileStructureOperations.GetDirectories(projectDirectoryInfo);
+
+        return new ProjectGeneration
+        {
+            ProjectId = projectId,
+            FileStructure = nodes
+        };
+
+/*        bool isProjectGenerated = true;
 
         foreach (string command in response.Commands)
         {
@@ -72,7 +84,6 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery,
 
                 return new ProjectGeneration
                 {
-                    ConversationId = response.ConversationId,
                     ProjectId = projectId,
                     FileStructure = null
                 };
@@ -83,7 +94,6 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery,
 
                 return new ProjectGeneration
                 {
-                    ConversationId = response.ConversationId,
                     ProjectId = null,
                     FileStructure = null
                 };
@@ -93,11 +103,10 @@ public class GenerateProjectQueryHandler : IRequestHandler<GenerateProjectQuery,
         {
             return new ProjectGeneration
             {
-                ConversationId = response.ConversationId,
                 ProjectId = null,
                 FileStructure = null
             };
-        }
+        }*/
     }
 
     private static void ZipFolder(string sourceDirectory, string destinationZipFilePath)

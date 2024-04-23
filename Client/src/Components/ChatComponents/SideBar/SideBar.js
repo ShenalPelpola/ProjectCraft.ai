@@ -6,7 +6,7 @@ import home from '../../../assets/home.svg';
 import saved from '../../../assets/bookmark.svg';
 import './SideBar.scss';
 
-export const SideBar = () => {
+export const SideBar = ({ toggleCreateWindow }) => {
     return (
         <div className="side-bar">
             <div className="upper">
@@ -14,7 +14,7 @@ export const SideBar = () => {
                     <img src={logo} alt="logo" className="logo" />
                     <span className="brand">ProjectCraft.ai</span>
                 </div>
-                <button className="create-project-btn">
+                <button className="create-project-btn" onClick={toggleCreateWindow}>
                     <img src={addBtn} alt="new project" className="add-icon" />
                     <span>New Project</span>
                 </button>

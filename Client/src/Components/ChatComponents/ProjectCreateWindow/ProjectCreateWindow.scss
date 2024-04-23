@@ -1,0 +1,45 @@
+.solution-field {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.standalone-project {
+    margin-top: 1rem;
+    margin-left: -10px;
+}
+
+.dropdown {
+    margin-top: 2rem;
+}
+
+.btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    gap: 8px;
+    padding: 1rem 0;
+
+    .create-project-submit-btn {
+        background: #2BB46F;
+        color: #fff;
+
+        &:hover {
+            background-color: #2BB46F;
+        }
+    }
+
+    .create-project-close-btn {
+        background: #fff;
+    }
+}
+
+.error {
+    border: 1px solid red;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
